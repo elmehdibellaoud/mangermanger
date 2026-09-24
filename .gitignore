@@ -1,0 +1,47 @@
+# env
+.env
+.env.local
+.env.*.local
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+*.sqlite3
+media/
+staticfiles/
+
+# node
+node_modules/
+dist/
+coverage/
+
+# OS
+.DS_Store
+.idea/
+.vscode/
+.claude/
+
+# Project-specific — reports, presentations, logos
+rapport.tex
+rapport.pdf
+presentation.html
+presentation.pdf
+export_pdf.js
+script_presentation.md
+*.png
+*.jpg
+*.jpeg
+*.svg
+
+# Diagrams — keep source .puml, exclude rendered images
+diagrams/*.png
+diagrams/*.jpg
+
+# Misc
+package.json
+package-lock.json
+USERS.txt

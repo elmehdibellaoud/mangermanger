@@ -1,0 +1,43 @@
+@startuml MODADM
+skinparam backgroundColor #FAFAFA
+skinparam ActorStyle awesome
+skinparam usecase {
+  BackgroundColor #FFF8F0
+  BorderColor #C0703A
+  ArrowColor #7A3E1D
+  FontName Arial
+}
+skinparam actor {
+  BackgroundColor #FFF0E0
+  BorderColor #C0703A
+  FontName Arial
+  FontSize 13
+}
+skinparam title {
+  FontSize 16
+  FontStyle bold
+}
+
+title Diagramme de cas d'utilisation — Module Administration
+
+left to right direction
+
+actor "Gérant" as gerant
+
+rectangle "Module Administration (Back-Office)" {
+  usecase "Gérer le menu\n(plats & catégories)"     as UC_Menu
+  usecase "Gérer les stocks\n(ingrédients)"          as UC_Stock
+  usecase "Gérer le personnel\n(employés & rôles)"   as UC_Staff
+  usecase "Consulter le\ntableau de bord"            as UC_Dashboard
+  usecase "Consulter les\navis clients"              as UC_Reviews
+  usecase "Gérer les\nréservations"                  as UC_Reservations
+}
+
+gerant --> UC_Menu
+gerant --> UC_Stock
+gerant --> UC_Staff
+gerant --> UC_Dashboard
+gerant --> UC_Reviews
+gerant --> UC_Reservations
+
+@enduml

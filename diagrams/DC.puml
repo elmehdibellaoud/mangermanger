@@ -1,0 +1,207 @@
+@startuml DC
+skinparam backgroundColor #FAFAFA
+skinparam classBackgroundColor #F0F8FF
+skinparam classBorderColor #2A6496
+skinparam classArrowColor #1A3D5C
+skinparam classFontName Arial
+skinparam classFontSize 12
+skinparam title {
+  FontSize 16
+  FontStyle bold
+}
+skinparam linetype ortho
+
+title Diagramme de classes — MangerManger
+
+' ===================== ACCOUNTS =====================
+
+class User {
+  + id : int
+  + email : EmailField
+  + first_name : str
+  + last_name : str
+  + password : str (hashé)
+  + role : Role <<choices>>
+  + is_active : bool
+  + date_joined : datetime
+  --
+  + is_staff_role() : bool
+}
+
+enum Role {
+  CLIENT
+  SERVEUR
+  CUISINIER
+  GERANT
+}
+
+class Profile {
+  + id : int
+  + phone : str
+  + address : str
+  + birth_date : date
+  + avatar : ImageField
+}
+
+User "1" *-- "1" Profile : profil étendu
+User --> Role : role
+
+' ===================== MENU =====================
+
+class Category {
+  + id : int
+  + name : str
+  + slug : str
+  + display_order : int
+}
+
+class Dish {
+  + id : int
+  + name : str
+  + description : text
+  + price : Decimal
+  + is_available : bool
+  + prep_time : int
+  + image : ImageField
+}
+
+class Ingredient {
+  + id : int
+  + name : str
+  + unit : Unit <<choices>>
+  + cost_per_unit : Decimal
+}
+
+class DishIngredient {
+  + quantity : Decimal
+}
+
+enum Unit {
+  kg
+  L
+  unit
+}
+
+Dish "N" --> "1" Category      : catégorie
+Dish "N" *-- "N" Ingredient    : via DishIngredient
+DishIngredient --> Dish
+DishIngredient --> Ingredient
+Ingredient --> Unit : unit
+
+' ===================== ORDERS =====================
+
+class Table {
+  + id : int
+  + number : int
+  + capacity : int
+  + status : TableStatus <<choices>>
+}
+
+class Order {
+  + id : int
+  + status : OrderStatus <<choices>>
+  + total : Decimal
+  + discount : Decimal
+  + notes : text
+  + created_at : datetime
+  --
+  + recompute_total() : Decimal
+}
+
+class OrderItem {
+  + id : int
+  + quantity : int
+  + unit_price : Decimal
+  + notes : str
+  + status : OrderItemStatus <<choices>>
+}
+
+enum OrderStatus {
+  DRAFT
+  SENT
+  PREPARING
+  READY
+  SERVED
+  PAID
+  CANCELLED
+}
+
+enum TableStatus {
+  FREE
+  OCCUPIED
+  RESERVED
+}
+
+Order "N" --> "1"    Table   : table
+Order "N" --> "0..1" User    : client
+Order "N" --> "0..1" User    : serveur
+Order "1" *-- "N"    OrderItem
+OrderItem "N" --> "1" Dish
+Order --> OrderStatus : status
+Table --> TableStatus : status
+
+' ===================== RESERVATIONS =====================
+
+class Reservation {
+  + id : int
+  + guest_name : str
+  + guest_email : str
+  + guest_phone : str
+  + date : date
+  + time : time
+  + guests : int
+  + status : ReservationStatus <<choices>>
+  + notes : text
+}
+
+enum ReservationStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  SEATED
+  EXPIRED
+}
+
+Reservation "N" --> "0..1" User  : client
+Reservation "N" --> "0..1" Table : table
+Reservation --> ReservationStatus : status
+
+' ===================== REVIEWS =====================
+
+class Review {
+  + id : int
+  + rating : int (1-5)
+  + comment : text
+  + is_approved : bool
+  + sentiment : Sentiment <<choices>>
+  + sentiment_score : float
+  + analyzed_at : datetime
+  + created_at : datetime
+}
+
+enum Sentiment {
+  POSITIVE
+  NEUTRAL
+  NEGATIVE
+}
+
+Review "N" --> "0..1" User  : client
+Review "N" --> "1"    Dish  : plat
+Review --> Sentiment : sentiment
+
+' ===================== PROMOTIONS =====================
+
+class PromoCode {
+  + id : int
+  + code : str
+  + discount_pct : Decimal
+  + max_uses : int
+  + used_count : int
+  + valid_from : date
+  + valid_until : date
+  + is_active : bool
+}
+
+Order "N" --> "0..1" PromoCode : promo appliquée
+
+@enduml

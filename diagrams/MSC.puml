@@ -1,0 +1,62 @@
+@startuml MSC
+skinparam backgroundColor #FAFAFA
+skinparam ActorStyle awesome
+skinparam usecase {
+  BackgroundColor #F0F8FF
+  BorderColor #2A6496
+  ArrowColor #1A3D5C
+  FontName Arial
+}
+skinparam actor {
+  BackgroundColor #E0F0FF
+  BorderColor #2A6496
+  FontName Arial
+  FontSize 13
+}
+skinparam title {
+  FontSize 16
+  FontStyle bold
+}
+
+title Diagramme de cas d'utilisation — Module Salle / Cuisine
+
+left to right direction
+
+actor "Serveur"   as serveur
+actor "Cuisinier" as cuisinier
+
+rectangle "Module Salle / Cuisine" {
+
+  package "Espace Serveur" {
+    usecase "Gérer les tables\n(libre / occupée / réservée)" as UC_Tables
+    usecase "Prendre une commande"    as UC_Order
+    usecase "Envoyer en cuisine"      as UC_Send
+    usecase "Modifier une commande"   as UC_EditOrder
+    usecase "Annuler une commande"    as UC_CancelOrder
+    usecase "Voir les suggestions\nde plats (IA)"    as UC_Suggest
+    usecase "Marquer commande\ncomme servie"  as UC_Serve
+  }
+
+  package "Espace Cuisine" {
+    usecase "Consulter commandes\nen attente"        as UC_KDS
+    usecase "Passer en\n«En préparation»"   as UC_Prep
+    usecase "Marquer plat\ncomme prêt"      as UC_Ready
+  }
+}
+
+serveur   --> UC_Tables
+serveur   --> UC_Order
+serveur   --> UC_EditOrder
+serveur   --> UC_CancelOrder
+serveur   --> UC_Suggest
+serveur   --> UC_Serve
+
+UC_Order  ..> UC_Send : <<include>>
+
+cuisinier --> UC_KDS
+cuisinier --> UC_Prep
+cuisinier --> UC_Ready
+
+UC_Send   ..> UC_KDS  : <<notifie>>
+
+@enduml

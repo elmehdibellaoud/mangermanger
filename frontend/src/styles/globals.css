@@ -1,0 +1,91 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Warm neutral palette — bone & ink */
+    --bone: 36 33% 96%;          /* #faf7f2 */
+    --ink: 24 10% 14%;           /* #282420 */
+
+    /* Terracotta accent */
+    --terracotta: 16 59% 44%;    /* #b4542f */
+    --terracotta-soft: 22 70% 92%;
+    --olive: 74 22% 38%;         /* #6a754b */
+
+    --background: var(--bone);
+    --foreground: var(--ink);
+
+    --card: 36 40% 98%;
+    --card-foreground: var(--ink);
+
+    --primary: var(--ink);
+    --primary-foreground: var(--bone);
+
+    --secondary: 30 20% 90%;
+    --secondary-foreground: var(--ink);
+
+    --muted: 30 20% 93%;
+    --muted-foreground: 24 8% 40%;
+
+    --accent: var(--terracotta);
+    --accent-foreground: 36 40% 98%;
+
+    --destructive: 0 72% 45%;
+    --destructive-foreground: 36 40% 98%;
+
+    --border: 28 18% 87%;
+    --input: 28 18% 87%;
+    --ring: var(--terracotta);
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 24 10% 8%;
+    --foreground: 36 33% 94%;
+
+    --card: 24 10% 11%;
+    --card-foreground: 36 33% 94%;
+
+    --primary: 36 33% 94%;
+    --primary-foreground: 24 10% 8%;
+
+    --secondary: 24 8% 18%;
+    --secondary-foreground: 36 33% 94%;
+
+    --muted: 24 8% 16%;
+    --muted-foreground: 30 8% 65%;
+
+    --accent: 16 70% 58%;
+    --accent-foreground: 24 10% 8%;
+
+    --destructive: 0 62% 55%;
+    --destructive-foreground: 36 33% 94%;
+
+    --border: 24 8% 20%;
+    --input: 24 8% 20%;
+    --ring: 16 70% 58%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: hsl(var(--terracotta) / 0.25);
+    color: hsl(var(--ink));
+  }
+}
+
+@layer components {
+  .glass {
+    @apply bg-card/70 backdrop-blur-md border border-border/50;
+  }
+}

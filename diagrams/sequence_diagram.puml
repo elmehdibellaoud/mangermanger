@@ -1,0 +1,70 @@
+@startuml sequence_diagram
+skinparam backgroundColor #FAFAFA
+skinparam sequenceMessageAlign center
+skinparam sequence {
+  ArrowColor #2A6496
+  ActorBorderColor #2A6496
+  LifeLineBorderColor #2A6496
+  ParticipantBackgroundColor #EEF6FF
+  ParticipantBorderColor #2A6496
+  ParticipantFontName Arial
+  ParticipantFontSize 12
+  ActorFontName Arial
+}
+skinparam note {
+  BackgroundColor #FFFDE7
+  BorderColor #F0A500
+  FontName Arial
+}
+skinparam title {
+  FontSize 16
+  FontStyle bold
+}
+
+title Diagramme de séquence — Pipeline d'analyse des sentiments (traitement asynchrone)
+
+actor       "Client"          as client
+participant "React Frontend"  as frontend
+participant "ReviewViewSet\n(DRF API)"  as api
+database    "PostgreSQL"       as db
+participant "Django Signal\n(post_save)" as signal
+participant "Celery / Redis\n(Message Broker)" as broker
+participant "Celery Worker"   as worker
+participant "Sentiment Engine\n(analyze_text)" as engine
+
+== Soumission de l'avis ==
+
+client   -> frontend  : Soumet un avis sur un plat
+frontend -> api       : POST /api/reviews/\n{dish_id, rating, comment}
+api      -> db        : INSERT Review\n(sentiment=NULL, analyzed_at=NULL)
+db      --> api       : Review instance (id=42)
+api     --> frontend  : 201 Created {id: 42}
+frontend --> client   : Confirmation d'envoi ✓
+
+== Traitement asynchrone (arrière-plan) ==
+
+api      -> signal    : Émet post_save\n(instance=Review#42, created=True)
+signal   -> broker    : analyze_review_sentiment.delay(review_id=42)
+broker  --> signal    : Tâche enfilée (ACK)
+
+note over broker : La réponse 201 est\ndéjà retournée au client.\nAucun blocage UI.
+
+broker   -> worker    : Consomme la tâche
+worker   -> db        : SELECT Review WHERE id=42
+db      --> worker    : Review#42 {comment: "..."}
+worker   -> engine    : analyze_text(comment)
+
+alt SENTIMENT_MODEL_ENABLED = True
+  engine -> engine    : HuggingFaceAnalyzer\n(XLM-RoBERTa via PyTorch)
+else fallback (dev / tests)
+  engine -> engine    : KeywordAnalyzer\n(lexique FR/EN/AR)
+end
+
+engine  --> worker    : SentimentResult\n{sentiment: "POSITIVE", score: 0.93}
+worker   -> worker    : Ajuste rating si nécessaire
+worker   -> db        : UPDATE Review#42\n(sentiment="POSITIVE", score=0.93,\nanalyzed_at=now())
+db      --> worker    : OK
+
+note over db : L'avis est maintenant\nanalysé et persisté.
+
+@enduml
